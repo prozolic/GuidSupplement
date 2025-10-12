@@ -1,0 +1,49 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net6.0;net8.0;net9.0;</TargetFrameworks>
+    <LangVersion>13</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <IsPackable>false</IsPackable>
+
+    <!--Microsoft.Testing.Platform-->
+    <OutputType>Exe</OutputType>
+    <UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
+    <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
+    <AssemblyName>GuidV7.Tests</AssemblyName>
+  </PropertyGroup>
+
+  <!-- Add .NET Framework test -->
+  <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
+    <TargetFrameworks>$(TargetFrameworks);net48</TargetFrameworks>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net6.0'">
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="[17.13.0]" Condition="'$(TargetFramework)' == 'net6.0'" />
+    <PackageReference Include="xunit.v3" Version="[1.1.0]" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' != 'net6.0'">
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="[18.0.0]" />
+    <PackageReference Include="xunit.v3" Version="3.0.1" />
+  </ItemGroup>
+
+  <!-- Common dependencies for all target frameworks -->
+  <ItemGroup>
+    <PackageReference Include="Shouldly" Version="4.3.0" />
+    <PackageReference Include="PolySharp" Version="1.15.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\GuidSupplement\GuidSupplement.csproj" />
+  </ItemGroup>
+
+</Project>
