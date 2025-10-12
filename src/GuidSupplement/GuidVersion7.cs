@@ -1,6 +1,11 @@
+//#pragma warning disable CS8763
+
+using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 
 namespace GuidSupplement;
 
@@ -42,7 +47,10 @@ public static class GuidVersion7
 #if NET8_0_OR_GREATER
         ArgumentOutOfRangeException.ThrowIfNegative(unix_ts_ms, nameof(timestamp));
 #else
-        ThrowIfNegative(unix_ts_ms, nameof(timestamp));
+        if (unix_ts_ms < 0)
+        {
+            ThrowIfNegative(unix_ts_ms, nameof(timestamp));
+        }
 #endif
 
         // Guid._a, Guid._b, Guid._c, Guid._d are accessed via Unsafe to avoid the overhead.
@@ -76,30 +84,46 @@ public static class GuidVersion7
     public static Guid Create(DateTimeOffset timestamp) => Guid.CreateVersion7(timestamp);
 #endif
 
-    public static bool IsVersion7(Guid guid)
+    public static int GetVersion(Guid guid)
     {
 #if NET9_0_OR_GREATER
-        return guid.Version == 7;
+        return guid.Version;
 #else
         // Guid._c include the version field.
         // XXXXXXXX-XXXX-7XXX-XXXX-XXXXXXXXXXXX
         // int-short-short-byte-byte-byte-byte-byte-byte
 
         var c = Unsafe.ReadUnaligned<ushort>(ref Unsafe.Add(ref Unsafe.As<Guid, byte>(ref Unsafe.AsRef(in guid)), 6));
-        return (c >>> 12) == 7;
+        return (c >>> 12);
 #endif
+    }
+
+    public static bool IsVersion7(Guid guid)
+    {
+#if NET9_0_OR_GREATER
+        return guid.Version
+#else
+        return GetVersion(guid)
+#endif
+        == 7;
     }
 
     public static DateTimeOffset GetTimestamp(Guid guid)
     {
-        ThrowIfNotVersion7Guid(guid);
+        if (!IsVersion7(guid))
+        {
+            ThrowIfNotVersion7Guid(guid);
+        }
 
         return DateTimeOffset.FromUnixTimeMilliseconds(GetUnixTimeSecondsCore(guid));
     }
 
     public static long GetUnixTimeSeconds(Guid guid)
     {
-        ThrowIfNotVersion7Guid(guid);
+        if (!IsVersion7(guid))
+        {
+            ThrowIfNotVersion7Guid(guid);
+        }
 
         return GetUnixTimeSecondsCore(guid);
     }
@@ -107,33 +131,22 @@ public static class GuidVersion7
     private static long GetUnixTimeSecondsCore(Guid guid)
     {
         // Timestamp is 48-bit big-endian unsigned number.
+        // But Guid in .NET is little-endian.
         // Guid._a(uint) + Guid._b(ushort) 
+
         ref var ptr = ref Unsafe.As<Guid, byte>(ref Unsafe.AsRef(in guid));
         var lower = ((long)Unsafe.ReadUnaligned<uint>(ref ptr)) << 16;
         var upper = (long)Unsafe.ReadUnaligned<ushort>(ref Unsafe.Add(ref ptr, 4));
         return upper + lower;
     }
 
-    [DoesNotReturn, MethodImpl(MethodImplOptions.NoInlining)]
-    private static void ThrowIfNotVersion7Guid(Guid guid)
-    {
-        if (!IsVersion7(guid))
-        {
-            throw new ArgumentException("Value is not a version 7 Guid.");
-        }
-    }
+    [DoesNotReturn]
+    private static void ThrowIfNotVersion7Guid(Guid guid) => throw new ArgumentException("Value is not a version 7 Guid.");
 
-    [DoesNotReturn, MethodImpl(MethodImplOptions.NoInlining)]
-    private static void ThrowIfNegative(long unixTimeMilliseconds, string paramName)
-    {
-        if (unixTimeMilliseconds < 0)
-        {
-            throw new ArgumentOutOfRangeException(paramName, unixTimeMilliseconds, $"{paramName} ('{unixTimeMilliseconds}') must be a non-negative value.");
-        }
-    }
+    [DoesNotReturn]
+    private static void ThrowIfNegative(long unixTimeMilliseconds, string paramName) => throw new ArgumentOutOfRangeException(paramName, unixTimeMilliseconds, $"{paramName} ('{unixTimeMilliseconds}') must be a non-negative value.");
 
-
-    internal partial class TimestampGuidComparer : IComparer<Guid>
+    private sealed class TimestampGuidComparer : IComparer<Guid>
     {
         public static readonly TimestampGuidComparer Instance = new();
 
@@ -141,8 +154,8 @@ public static class GuidVersion7
         {
             if (IsVersion7(x) && IsVersion7(y))
             {
-                var xTimestamp = GetUnixTimeSeconds(x);
-                var yTimestamp = GetUnixTimeSeconds(y);
+                var xTimestamp = GetUnixTimeSecondsCore(x);
+                var yTimestamp = GetUnixTimeSecondsCore(y);
                 return xTimestamp.CompareTo(yTimestamp);
             }
 
