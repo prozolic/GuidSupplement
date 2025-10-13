@@ -1,4 +1,4 @@
-
+﻿
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
@@ -13,7 +13,7 @@ public static class GuidVersion7
 #if !NET9_0_OR_GREATER
 
     // =============================================================================
-    // The following source code is based on the implementation of Guid.NewGuid() in dotnet/runtime.
+    // The following source code is based on the implementation of Guid.CreateVersion7() in dotnet/runtime.
     // https://github.com/dotnet/runtime/blob/main/src/libraries/System.Private.CoreLib/src/System/Guid.cs#L297
     // =============================================================================
 
@@ -79,26 +79,12 @@ public static class GuidVersion7
     public static Guid Create(DateTimeOffset timestamp) => Guid.CreateVersion7(timestamp);
 #endif
 
-    public static int GetVersion(Guid guid)
-    {
-#if NET9_0_OR_GREATER
-        return guid.Version;
-#else
-        // Guid._c include the version field.
-        // XXXXXXXX-XXXX-7XXX-XXXX-XXXXXXXXXXXX
-        // int-short-short-byte-byte-byte-byte-byte-byte
-
-        var c = Unsafe.ReadUnaligned<ushort>(ref Unsafe.Add(ref Unsafe.As<Guid, byte>(ref Unsafe.AsRef(in guid)), 6));
-        return (c >>> 12);
-#endif
-    }
-
     public static bool IsVersion7(Guid guid)
     {
 #if NET9_0_OR_GREATER
         return guid.Version
 #else
-        return GetVersion(guid)
+        return guid.GetVersion()
 #endif
         == 7;
     }
@@ -126,13 +112,13 @@ public static class GuidVersion7
     private static long GetUnixTimeSecondsCore(Guid guid)
     {
         // Timestamp is 48-bit big-endian unsigned number.
-        // But Guid in .NET is little-endian.
-        // Guid._a(uint) + Guid._b(ushort) 
+        // But .NET GUID is little-endian.
+        // Guid._a(uint) + Guid._b(ushort)
 
         ref var ptr = ref Unsafe.As<Guid, byte>(ref Unsafe.AsRef(in guid));
         var lower = ((long)Unsafe.ReadUnaligned<uint>(ref ptr)) << 16;
         var upper = (long)Unsafe.ReadUnaligned<ushort>(ref Unsafe.Add(ref ptr, 4));
-        return upper + lower;
+        return upper | lower;
     }
 
     [DoesNotReturn]

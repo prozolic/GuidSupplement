@@ -1,9 +1,8 @@
 ﻿
-using Xunit;
 using Shouldly;
+using Xunit;
 
 namespace GuidSupplement.Tests;
-
 
 public class GuidSupplementTest
 {
@@ -11,9 +10,7 @@ public class GuidSupplementTest
     public void CreateTest()
     {
         var id = GuidVersion7.Create();
-
-        var timeStamp = DateTimeOffset.UtcNow;
-        var id2 = GuidVersion7.Create(timeStamp);
+        var id2 = GuidVersion7.Create(DateTimeOffset.UtcNow);
     }
 
     [Fact]
@@ -51,10 +48,29 @@ public class GuidSupplementTest
     [Fact]
     public void GetVersionTest()
     {
-        var expected = 7;
-        var id = GuidVersion7.Create();
-        var version = GuidVersion7.GetVersion(id);
-        version.ShouldBe(expected);
+        {
+            var id = Guid.NewGuid();
+            id.GetVersion().ShouldBe(4);
+        }
+
+        {
+            var id = GuidVersion7.Create();
+            id.GetVersion().ShouldBe(7);
+        }
+    }
+
+    [Fact]
+    public void GetVariantTest()
+    {
+        {
+            var id = Guid.NewGuid();
+            var variant = id.GetVariant();
+        }
+
+        {
+            var id = GuidVersion7.Create();
+            var variant = id.GetVariant();
+        }
     }
 
 
