@@ -73,7 +73,6 @@ public class GuidSupplementTest
         }
     }
 
-
     [Fact]
     public void IsVersion7Test()
     {
@@ -101,4 +100,22 @@ public class GuidSupplementTest
         ids.SequenceEqual(shuffled).ShouldBeTrue();
     }
 
+    [Fact]
+    public void TryWriteBytesTest()
+    {
+        var id = new Guid("00112233-4455-6677-8899-aabbccddeeff");
+
+        Span<byte> value = stackalloc byte[16];
+        id.TryWriteBytes(value).ShouldBeTrue();
+        value.ToArray().ShouldBe([51, 34, 17, 0, 85, 68, 119, 102, 136, 153, 170, 187, 204, 221, 238, 255]);
+
+        Span<byte> value2 = stackalloc byte[16];
+        id.TryWriteBytes(value2, false, out _).ShouldBeTrue();
+        value2.ToArray().ShouldBe([51, 34, 17, 0, 85, 68, 119, 102, 136, 153, 170, 187, 204, 221, 238, 255]);
+
+        Span<byte> value3 = stackalloc byte[16];
+        id.TryWriteBytes(value3, true, out _).ShouldBeTrue();
+        value3.ToArray().ShouldBe([0, 17, 34, 51, 68, 85, 102, 119, 136, 153, 170, 187, 204, 221, 238, 255]);
+
+    }
 }
