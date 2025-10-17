@@ -21,7 +21,7 @@ However, these features are not available in older .NET environments (e.g., .NET
 
 ## Target Runtime
 
-NET Standard 2.0, 2.1, NET 8, NET 9
+.NET Standard 2.0, .NET Standard 2.1, .NET 8, .NET 9
 
 ## `GuidVersion7` class
 
