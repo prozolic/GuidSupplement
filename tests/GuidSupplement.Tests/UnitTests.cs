@@ -89,14 +89,19 @@ public class GuidSupplementTest
     }
 
     [Fact]
-    public async Task TimestampComparerTest()
+    public void TimestampComparerTest()
     {
-        var ids = new List<Guid>(100);
-        for (int i = 0; i < 100; i++)
-        {
-            ids.Add(GuidVersion7.Create(new DateTimeOffset(DateTime.Now)));
-            await Task.Delay(1, TestContext.Current.CancellationToken);
-        }
+        var ids = new List<Guid>();
+        ids.Add(GuidVersion7.Create(new DateTimeOffset(2025, 10, 17, 23, 49, 0, TimeSpan.Zero)));
+        ids.Add(GuidVersion7.Create(new DateTimeOffset(2025, 10, 17, 23, 49, 1, TimeSpan.Zero)));
+        ids.Add(GuidVersion7.Create(new DateTimeOffset(2025, 10, 17, 23, 49, 2, TimeSpan.Zero)));
+        ids.Add(GuidVersion7.Create(new DateTimeOffset(2025, 10, 17, 23, 49, 3, TimeSpan.Zero)));
+        ids.Add(GuidVersion7.Create(new DateTimeOffset(2025, 10, 17, 23, 49, 4, TimeSpan.Zero)));
+        ids.Add(GuidVersion7.Create(new DateTimeOffset(2025, 10, 17, 23, 50, 0, TimeSpan.Zero)));
+        ids.Add(GuidVersion7.Create(new DateTimeOffset(2025, 10, 17, 23, 50, 1, TimeSpan.Zero)));
+        ids.Add(GuidVersion7.Create(new DateTimeOffset(2025, 10, 17, 23, 50, 10, TimeSpan.Zero)));
+        ids.Add(GuidVersion7.Create(new DateTimeOffset(2025, 10, 17, 23, 55, 0, TimeSpan.Zero)));
+        ids.Add(GuidVersion7.Create(new DateTimeOffset(2025, 10, 18, 0, 0, 0, TimeSpan.Zero)));
 
         var shuffled = ids.OrderBy(_ => Guid.NewGuid()).ToList();
         ids.SequenceEqual(shuffled).ShouldBeFalse();
