@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.Buffers.Binary;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -78,6 +79,21 @@ public static class GuidExtensions
         bytesWritten = 16;
         return true;
     }
+
+    public static byte[] ToByteArray(this Guid guid)
+    {
+        var bytes = new byte[16];
+        guid.TryWriteBytes(bytes.AsSpan());
+        return bytes;
+    }
+
+    public static byte[] ToByteArray(this Guid guid, bool bigEndian)
+    {
+        var bytes = new byte[16];
+        guid.TryWriteBytes(bytes.AsSpan(), bigEndian, out _);
+        return bytes;
+    }
+
 
 #endif
 

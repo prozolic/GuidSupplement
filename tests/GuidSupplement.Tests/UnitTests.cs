@@ -11,6 +11,11 @@ public class GuidSupplementTest
     {
         var id = GuidVersion7.Create();
         var id2 = GuidVersion7.Create(DateTimeOffset.UtcNow);
+
+        if (GuidVersion7.IsVersion7(id))
+        {
+            Console.WriteLine("Id is UUID version 7");
+        }
     }
 
     [Fact]
@@ -117,5 +122,14 @@ public class GuidSupplementTest
         id.TryWriteBytes(value3, true, out _).ShouldBeTrue();
         value3.ToArray().ShouldBe([0, 17, 34, 51, 68, 85, 102, 119, 136, 153, 170, 187, 204, 221, 238, 255]);
 
+    }
+
+    [Fact]
+    public void ToByteArrayTest()
+    {
+        var id = new Guid("00112233-4455-6677-8899-aabbccddeeff");
+        id.ToByteArray().ShouldBe([51, 34, 17, 0, 85, 68, 119, 102, 136, 153, 170, 187, 204, 221, 238, 255]);
+        id.ToByteArray(false).ShouldBe([51, 34, 17, 0, 85, 68, 119, 102, 136, 153, 170, 187, 204, 221, 238, 255]);
+        id.ToByteArray(true).ShouldBe([0, 17, 34, 51, 68, 85, 102, 119, 136, 153, 170, 187, 204, 221, 238, 255]);
     }
 }
