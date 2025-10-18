@@ -73,12 +73,11 @@ long timestamp = GuidVersion7.GetUnixTimeSeconds(id);
 ### `TimestampComparer` property
 
 ```csharp
-var ids = new List<Guid>(100);
-for (int i = 0; i < 100; i++)
-{
-    ids.Add(GuidVersion7.Create(new DateTimeOffset(DateTime.Now)));
-    await Task.Delay(1, TestContext.Current.CancellationToken);
-}
+var ids = new List<Guid>();
+ids.Add(GuidVersion7.Create(new DateTimeOffset(2025, 10, 17, 23, 49, 0, TimeSpan.Zero)));
+ids.Add(GuidVersion7.Create(new DateTimeOffset(2025, 10, 17, 23, 49, 1, TimeSpan.Zero)));
+ids.Add(GuidVersion7.Create(new DateTimeOffset(2025, 10, 17, 23, 49, 2, TimeSpan.Zero)));
+ids.Add(GuidVersion7.Create(new DateTimeOffset(2025, 10, 17, 23, 49, 3, TimeSpan.Zero)));
 
 var shuffled = ids.OrderBy(_ => Guid.NewGuid()).ToList();
 shuffled.Sort(GuidVersion7.TimestampComparer);
@@ -98,12 +97,12 @@ id.TryWriteBytes(value);
 // [51, 34, 17, 0, 85, 68, 119, 102, 136, 153, 170, 187, 204, 221, 238, 255]
 ```
 
-### `Guid.ToByteArray` method
+### `Guid.ToByteArray(bool bigEndian)` method
 
 ```csharp
 var id = new Guid("00112233-4455-6677-8899-aabbccddeeff");
 
-var bytes = id.ToByteArray();
+var bytes = id.ToByteArray(false);
 // [51, 34, 17, 0, 85, 68, 119, 102, 136, 153, 170, 187, 204, 221, 238, 255]
 ```
 

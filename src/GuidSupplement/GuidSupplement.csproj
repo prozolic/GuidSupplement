@@ -17,6 +17,7 @@
     <VersionPrefix>1.0.0</VersionPrefix>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <Description>Guid Supplement.</Description>
+    <Title>GuidSupplement</Title>
   </PropertyGroup>
 
   <!-- NativeAOT-->
