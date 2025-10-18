@@ -2,6 +2,7 @@
 
 Starting with .NET 9, Guid has added functionality compliant with UUID Version 7.
 However, these features are not available in older .NET environments (e.g., .NET Standard 2.0), so GuidSupplement provides nearly equivalent functionality for these platforms.
+You can install package from [NuGet/GuidSupplement](https://www.nuget.org/packages/GuidSupplement).
 
 ## Table of Contents
 
