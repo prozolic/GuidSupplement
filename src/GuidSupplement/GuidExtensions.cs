@@ -80,13 +80,6 @@ public static class GuidExtensions
         return true;
     }
 
-    public static byte[] ToByteArray(this Guid guid)
-    {
-        var bytes = new byte[16];
-        guid.TryWriteBytes(bytes.AsSpan());
-        return bytes;
-    }
-
     public static byte[] ToByteArray(this Guid guid, bool bigEndian)
     {
         var bytes = new byte[16];
