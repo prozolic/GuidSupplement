@@ -22,7 +22,7 @@ You can install package from [NuGet/GuidSupplement](https://www.nuget.org/packag
 
 ## Target Runtime
 
-.NET Standard 2.0, .NET Standard 2.1, .NET 8, .NET 9
+.NET Standard 2.0, .NET Standard 2.1, .NET 8, .NET 9, .NET 10
 
 ## `GuidVersion7` class
 
