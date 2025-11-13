@@ -33,6 +33,7 @@ jobs:
           if-no-files-found: error
 
   publish:
+    needs: [pack]
     permissions:
       contents: write
       id-token: write # for NuGet Trusted Publish
@@ -60,4 +61,5 @@ jobs:
       # upload nuget
       - run: dotnet nuget push "./nuget/*.nupkg" --skip-duplicate -s https://api.nuget.org/v3/index.json -k "${NUGET_KEY}"
         env:
+
           NUGET_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
